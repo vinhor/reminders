@@ -40,11 +40,11 @@ func main() {
 func printHelp(exit bool) {
 	fmt.Println("Usage: remind <command> [arguments]")
 	fmt.Println("Commands:")
-	fmt.Println("  add - Add a note")
-	fmt.Println("  list - List all notes")
-	fmt.Println("  remove <id> - Remove a note")
-	fmt.Println("  edit <id> - Edit a note")
-	fmt.Println("  rm-all - Remove all notes")
+	fmt.Println("  add - Add a reminder")
+	fmt.Println("  list - List all the reminders")
+	fmt.Println("  remove <id> - Remove a reminder")
+	fmt.Println("  edit <id> - Edit a reminder")
+	fmt.Println("  rm-all - Remove all the reminders")
 	fmt.Println("  help - Print this help message")
 	if exit {
 		os.Exit(1)
@@ -63,7 +63,7 @@ func checkArgs() {
 		}
 	case "edit":
 		if len(os.Args) < 3 {
-			color.Red("Error: Missing ID and/or note argument")
+			color.Red("Error: Missing ID argument")
 			os.Exit(1)
 		}
 	}
