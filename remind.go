@@ -8,8 +8,6 @@ import (
 	"github.com/fatih/color"
 )
 
-// TODO: Make error messages more user-friendly.
-
 func main() {
 	checkArgs()
 	switch os.Args[1] {
@@ -54,6 +52,9 @@ func printHelp(exit bool) {
 }
 
 func checkArgs() {
+	if len(os.Args) < 2 {
+		printHelp(true)
+	}
 	switch os.Args[1] {
 	case "remove":
 		if len(os.Args) != 3 {
