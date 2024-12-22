@@ -109,6 +109,10 @@ func addUnix() {
 
 func listUnix() {
 	reminders, _ := openRemindersUnix()
+	if len(reminders) == 0 {
+		fmt.Println("No reminders found.")
+		return
+	}
 	fmt.Println("ID | Priority | Due                              | Text")
 	for _, reminder := range reminders {
 		var timeLayout string
