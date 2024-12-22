@@ -14,9 +14,11 @@ type Reminder struct {
 	Text     string    `json:"text"`
 	Priority int       `json:"priority"`
 	Due      time.Time `json:"due"`
+	Id       int       `json:"id"`
+	WithTime bool      `json:"withTime"`
 }
 
-func addUnix() {
+func openRemindersUnix() ([]Reminder, string) {
 	homeDir, _ := os.UserHomeDir()
 	filesPath := filepath.Join(homeDir, ".local/share/vinhor-reminders.json")
 	file, err := os.ReadFile(filesPath)
@@ -30,8 +32,14 @@ func addUnix() {
 			panic(err)
 		}
 	}
+	return reminders, filesPath
+}
+
+func addUnix() {
+	reminders, filesPath := openRemindersUnix()
 	var newReminderData Reminder
 	var date string
+	var err error
 
 	scanner := bufio.NewScanner(os.Stdin)
 
@@ -60,6 +68,7 @@ func addUnix() {
 		panic("Error reading answer")
 	}
 	if timeChoice == "y" {
+		newReminderData.WithTime = true
 		fmt.Println("Please enter the due date in 24-hour format (2024 Dec 02 18:01):")
 		if scanner.Scan() {
 			date = scanner.Text()
@@ -71,6 +80,7 @@ func addUnix() {
 			panic("Error reading date")
 		}
 	} else if timeChoice == "n" {
+		newReminderData.WithTime = false
 		fmt.Println("Please enter the due date in 24-hour format (2024 Dec 02):")
 		if scanner.Scan() {
 			date = scanner.Text()
@@ -83,6 +93,8 @@ func addUnix() {
 		}
 	}
 
+	newReminderData.Id = len(reminders) + 1
+
 	newReminderData.Due = newReminderData.Due.In(time.Local)
 	reminders = append(reminders, newReminderData)
 	newFile, err := json.MarshalIndent(reminders, "", "  ")
@@ -92,5 +104,20 @@ func addUnix() {
 	err = os.WriteFile(filesPath, newFile, 0644)
 	if err != nil {
 		panic(err)
+	}
+}
+
+func listUnix() {
+	reminders, _ := openRemindersUnix()
+	fmt.Println("ID | Priority | Due                              | Text")
+	for _, reminder := range reminders {
+		var timeLayout string
+		if reminder.WithTime {
+			timeLayout = "2006 Jan 02, 15:04, -0700 offset"
+		} else {
+			timeLayout = "2006 Jan 02                     "
+		}
+		timeStamp := reminder.Due.Format(timeLayout)
+		fmt.Printf("%d  | %d        | %s | %s\n", reminder.Id, reminder.Priority, timeStamp, reminder.Text)
 	}
 }

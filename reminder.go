@@ -12,6 +12,8 @@ func main() {
 	switch os.Args[1] {
 	case "add":
 		addUnix()
+	case "list":
+		listUnix()
 	}
 }
 
