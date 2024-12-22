@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/fatih/color"
 )
@@ -16,6 +17,12 @@ func main() {
 		listUnix()
 	case "rm-all":
 		rmAllUnix()
+	case "remove":
+		id, err := strconv.Atoi(os.Args[2])
+		if err != nil || id <= 0 {
+			panic(err)
+		}
+		removeUnix(id)
 	}
 }
 
@@ -39,7 +46,7 @@ func checkArgs() {
 	}
 	switch os.Args[1] {
 	case "remove":
-		if len(os.Args) < 3 {
+		if len(os.Args) != 3 {
 			color.Red("Error: Missing ID argument")
 			os.Exit(1)
 		}

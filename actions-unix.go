@@ -39,6 +39,16 @@ func openRemindersUnix() ([]Reminder, string) {
 	}
 	return reminders, filePath
 }
+func saveFile(reminders []Reminder, filePath string) {
+	newFile, err := json.MarshalIndent(reminders, "", "  ")
+	if err != nil {
+		panic(err)
+	}
+	err = os.WriteFile(filePath, newFile, 0644)
+	if err != nil {
+		panic(err)
+	}
+}
 
 func addUnix() {
 	reminders, filePath := openRemindersUnix()
@@ -65,7 +75,7 @@ func addUnix() {
 
 	var timeChoice string
 	fmt.Println("Do you want to set hour and minute? y/n")
-	if scanner.Scan() {
+	if !scanner.Scan() {
 		panic("Error reading answer")
 	}
 	timeChoice = scanner.Text()
@@ -97,14 +107,7 @@ func addUnix() {
 
 	newReminderData.Due = newReminderData.Due.In(time.Local)
 	reminders = append(reminders, newReminderData)
-	newFile, err := json.MarshalIndent(reminders, "", "  ")
-	if err != nil {
-		panic(err)
-	}
-	err = os.WriteFile(filePath, newFile, 0644)
-	if err != nil {
-		panic(err)
-	}
+	saveFile(reminders, filePath)
 }
 
 func listUnix() {
@@ -144,4 +147,15 @@ func rmAllUnix() {
 		panic(err)
 	}
 	fmt.Println("All reminders removed.")
+}
+
+func removeUnix(id int) {
+	id = id - 1
+	reminders, filePath := openRemindersUnix()
+	if id >= len(reminders) {
+		fmt.Println("Error: Invalid reminder ID")
+		return
+	}
+	reminders = append(reminders[:id], reminders[id+1:]...)
+	saveFile(reminders, filePath)
 }
