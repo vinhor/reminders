@@ -74,7 +74,7 @@ func addUnix() {
 	}
 
 	var timeChoice string
-	fmt.Println("Do you want to set hour and minute? y/n")
+	fmt.Println("Do you want to set hour and minute? (y/n)")
 	if !scanner.Scan() {
 		panic("Error reading answer")
 	}
@@ -158,4 +158,91 @@ func removeUnix(id int) {
 	}
 	reminders = append(reminders[:id], reminders[id+1:]...)
 	saveFile(reminders, filePath)
+}
+
+func editUnix(id int) {
+	id = id - 1
+	reminders, filePath := openRemindersUnix()
+	if id >= len(reminders) {
+		fmt.Println("Error: Invalid reminder ID")
+		return
+	}
+
+	reminder := reminders[id]
+	fmt.Println("ID | Priority | Due                              | Text")
+	var timeLayout string
+	if reminder.WithTime {
+		timeLayout = "2006 Jan 02, 15:04, -0700 offset"
+	} else {
+		timeLayout = "2006 Jan 02                     "
+	}
+	timeStamp := reminder.Due.Format(timeLayout)
+	fmt.Printf("%d  | %d        | %s | %s\n", reminder.Id, reminder.Priority, timeStamp, reminder.Text)
+
+	fmt.Println("What do you want to change? ([p]riority/[d]ue/[t]ext)")
+	var choice string
+	fmt.Scanln(&choice)
+	if choice != "p" && choice != "d" && choice != "t" {
+		fmt.Println("Invalid choice")
+		os.Exit(1)
+	}
+
+	switch choice {
+	case "p":
+		var newPriority int
+		fmt.Println("Please enter the new priority (1-3):")
+		fmt.Scan(&newPriority)
+		if newPriority < 1 || newPriority > 3 {
+			fmt.Println("Invalid priority")
+			os.Exit(1)
+		}
+		reminder.Priority = newPriority
+	case "d":
+		var timeChoice string
+		scanner := bufio.NewScanner(os.Stdin)
+		fmt.Println("Do you want to set hour and minute? (y/n)")
+		if !scanner.Scan() {
+			panic("Error reading answer")
+		}
+		timeChoice = scanner.Text()
+
+		if timeChoice == "y" {
+			reminder.WithTime = true
+			fmt.Println("Please enter the due date in 24-hour format (2024 Dec 02 18:01):")
+			if !scanner.Scan() {
+				panic("Error reading date")
+			}
+			date := scanner.Text()
+			var err error
+			reminder.Due, err = time.Parse("2006 Jan 02 15:04", date)
+			if err != nil {
+				panic(date)
+			}
+			reminder.Due = reminder.Due.In(time.Local)
+		} else if timeChoice == "n" {
+			reminder.WithTime = false
+			fmt.Println("Please enter the due date in 24-hour format (2024 Dec 02):")
+			if !scanner.Scan() {
+				panic("Error reading date")
+			}
+			date := scanner.Text()
+			var err error
+			fmt.Scanln(&date)
+			reminder.Due, err = time.Parse("2006 Jan 02", date)
+			if err != nil {
+				panic("Invalid date")
+			}
+			reminder.Due = reminder.Due.In(time.Local)
+		} else {
+			fmt.Println("Invalid choice")
+			os.Exit(1)
+		}
+	case "t":
+		fmt.Println("Enter the new reminder text:")
+		fmt.Scanln(&reminder.Text)
+	}
+
+	reminders = append(reminders[:id], reminder)
+	saveFile(reminders, filePath)
+	fmt.Println("Reminder updated.")
 }

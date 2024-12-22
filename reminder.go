@@ -8,6 +8,8 @@ import (
 	"github.com/fatih/color"
 )
 
+// TODO: Make error messages more user-friendly.
+
 func main() {
 	checkArgs()
 	switch os.Args[1] {
@@ -23,6 +25,12 @@ func main() {
 			panic(err)
 		}
 		removeUnix(id)
+	case "edit":
+		id, err := strconv.Atoi(os.Args[2])
+		if err != nil || id <= 0 {
+			panic(err)
+		}
+		editUnix(id)
 	}
 }
 
