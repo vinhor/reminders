@@ -14,6 +14,8 @@ func main() {
 		addUnix()
 	case "list":
 		listUnix()
+	case "rm-all":
+		rmAllUnix()
 	}
 }
 
@@ -24,6 +26,7 @@ func printHelp(exit bool) {
 	fmt.Println("  list - List all notes")
 	fmt.Println("  remove <id> - Remove a note")
 	fmt.Println("  edit <id> - Edit a note")
+	fmt.Println("  rm-all - Remove all notes")
 	fmt.Println("  help - Print this help message")
 	if exit {
 		os.Exit(1)
