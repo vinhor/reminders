@@ -31,11 +31,16 @@ func main() {
 			panic(err)
 		}
 		editUnix(id)
+	case "help":
+		printHelp(false)
+	default:
+		printHelp(true)
 	}
+
 }
 
 func printHelp(exit bool) {
-	fmt.Println("Usage: notes <command> [arguments]")
+	fmt.Println("Usage: remind <command> [arguments]")
 	fmt.Println("Commands:")
 	fmt.Println("  add - Add a note")
 	fmt.Println("  list - List all notes")
@@ -49,9 +54,6 @@ func printHelp(exit bool) {
 }
 
 func checkArgs() {
-	if len(os.Args) < 2 {
-		printHelp(true)
-	}
 	switch os.Args[1] {
 	case "remove":
 		if len(os.Args) != 3 {
